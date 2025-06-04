@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Inicio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+  <style>
+    .hero {
+      background-image: url('./img/img1.jpg');
+      background-size: cover;
+      background-position: center;
+      height: 60vh;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-shadow: 1px 1px 5px black;
+    }
+
+    .section {
+      padding: 60px 0;
+    }
+
+    .card img {
+      height: 200px;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="inicio.html">Mi Sitio</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="menu.html">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="servicios.html">Servicios</a></li>
+          <li class="nav-item"><a class="nav-link" href="dashboard.html">Citas Médicas</a></li>
+          <li class="nav-item"><a class="nav-link" href="calendario.html">Calendario</a></li>
+        </ul>
+        <span class="navbar-text text-white ms-3" id="userGreeting">Bienvenido, Usuario</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <h1>Bienvenido a la Página Principal</h1>
+  </header>
+
+  <!-- Información -->
+  <section class="section text-center">
+    <div class="container">
+      <h2>Información General</h2>
+      <p>Esta es la página principal donde encontrarás una vista general de nuestra aplicación</p>
+
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <div class="card">
+            <img src="img/info1.jpg" class="card-img-top" alt="Info 1">
+            <div class="card-body">
+              <h5 class="card-title">Inteligencia Artificial</h5>
+              <p class="card-text">Integracion de modulos de inteif¿gencia artificial</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="card">
+            <img src="img/info2.jpg" class="card-img-top" alt="Info 2">
+            <div class="card-body">
+              <h5 class="card-title">Robot</h5>
+              <p class="card-text">Implementacion de tecnologias de vanguardia como la robotica.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="card">
+            <img src="img/info3.jpg" class="card-img-top" alt="Info 3">
+            <div class="card-body">
+              <h5 class="card-title">Mantenimiento</h5>
+              <p class="card-text">Mantenimiento de componenetes electronicos para un buen funcionamiento.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="text-center text-white bg-dark p-3 mt-4">
+    &copy; 2025 Mi Sitio. Todos los derechos reservados.
+  </footer>
+
+  <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Simulación del usuario logueado (puedes reemplazarlo con una variable real de sesión)
+    const userName = localStorage.getItem('nombreUsuario') || 'Usuario';
+    document.getElementById('userGreeting').textContent = 'Bienvenido, ' + userName;
+  </script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Agendar Cita Médica</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f4f6f8;
+    }
+    .card {
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      border-radius: 12px;
+    }
+    #successAlert {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="inicio.html">Mi Sitio</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="menu.html">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="servicios.html">Servicios</a></li>
+          <li class="nav-item"><a class="nav-link" href="dashboard.html">Citas Médicas</a></li>
+          <li class="nav-item"><a class="nav-link" href="calendario.html">Calendario</a></li>
+        </ul>
+        <span class="navbar-text text-white ms-3" id="userGreeting">Bienvenido, Usuario</span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-5">
+    <div class="card p-4">
+      <h3 class="text-center mb-4">Agendar Cita Médica</h3>
+      <div class="alert alert-success" id="successAlert">Cita agendada correctamente.</div>
+      <form id="appointmentForm" class="row g-3">
+        <div class="col-md-6">
+          <input type="text" class="form-control" id="patientName" placeholder="Nombre del paciente" required>
+        </div>
+        <div class="col-md-6">
+          <select class="form-control" id="doctor" required>
+            <option value="">Seleccione doctor</option>
+            <option value="Dr. Ramírez">Dr. Ramírez</option>
+            <option value="Dra. López">Dra. López</option>
+            <option value="Dr. Torres">Dr. Torres</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <input type="date" class="form-control" id="date" required min="">
+        </div>
+        <div class="col-md-6">
+          <select class="form-control" id="time" required>
+            <option value="">Seleccione hora</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <input type="text" class="form-control" id="reason" placeholder="Motivo de la cita" required>
+        </div>
+        <div class="col-12 text-end">
+          <button type="submit" class="btn btn-primary">Agendar</button>
+          <a href="calendario.html" class="btn btn-secondary">Ver Calendario</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const timeSelect = document.getElementById('time');
+    const dateInput = document.getElementById('date');
+    const doctorSelect = document.getElementById('doctor');
+    const today = new Date().toISOString().split('T')[0];
+
+    // Bloquear fechas anteriores
+    dateInput.setAttribute('min', today);
+
+    // Bloquear fines de semana en input date
+    dateInput.addEventListener('input', () => {
+      const selectedDate = new Date(dateInput.value);
+      const day = selectedDate.getUTCDay();
+      if (day === 0 || day === 6) {
+        alert('No se pueden agendar citas en fines de semana.');
+        dateInput.value = '';
+        cargarHorasDisponibles();
+      }
+    });
+
+    function cargarHorasDisponibles(disabledHours = []) {
+      timeSelect.innerHTML = '<option value="">Seleccione hora</option>';
+      for (let i = 8; i <= 17; i++) {
+        const hour = i.toString().padStart(2, '0') + ':00';
+        const option = new Option(hour, hour);
+        if (disabledHours.includes(hour)) option.disabled = true;
+        timeSelect.appendChild(option);
+      }
+    }
+
+    async function actualizarHorasOcupadas() {
+      const date = dateInput.value;
+      const doctor = doctorSelect.value;
+      if (!date || !doctor) return cargarHorasDisponibles();
+
+      const token = localStorage.getItem('token');
+      const res = await fetch(`/api/appointments?date=${date}&doctor=${encodeURIComponent(doctor)}`, {
+        headers: { 'Authorization': token }
+      });
+      const appointments = await res.json();
+      const horasOcupadas = appointments.map(a => a.time);
+      cargarHorasDisponibles(horasOcupadas);
+    }
+
+    dateInput.addEventListener('change', actualizarHorasOcupadas);
+    doctorSelect.addEventListener('change', actualizarHorasOcupadas);
+
+    document.getElementById('appointmentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const token = localStorage.getItem('token');
+
+      const data = {
+        patientName: document.getElementById('patientName').value,
+        doctor: doctorSelect.value,
+        date: dateInput.value,
+        time: timeSelect.value,
+        reason: document.getElementById('reason').value,
+      };
+
+      // Validación de fecha
+      if (new Date(data.date) < new Date(today)) {
+        alert('La fecha seleccionada no puede ser anterior a hoy.');
+        return;
+      }
+
+      const res = await fetch('/api/appointments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (res.ok) {
+        document.getElementById('successAlert').style.display = 'block';
+        e.target.reset();
+        cargarHorasDisponibles();
+        setTimeout(() => {
+          document.getElementById('successAlert').style.display = 'none';
+        }, 3000);
+      } else {
+        alert('Error al agendar cita');
+      }
+    });
+
+    cargarHorasDisponibles();
+  </script>
+</body>
+</html>
