@@ -8,18 +8,21 @@
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="inicio.html">Mi Sitio</a>
+      <a class="navbar-brand fw-bold" href="inicio.html"><i class="bi bi-hospital"></i> SaludConecta</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link active" href="menu.html">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="menu.html">Inicio</a></li>
           <li class="nav-item"><a class="nav-link" href="servicios.html">Servicios</a></li>
           <li class="nav-item"><a class="nav-link" href="dashboard.html">Citas Médicas</a></li>
-          <li class="nav-item"><a class="nav-link" href="calendario.html">Calendario</a></li>
+          <li class="nav-item"><a class="nav-link active" href="calendario.html">Calendario</a></li>
+          <li class="nav-item"><a class="nav-link" href="perfil.html">Perfil</a></li>
+          <li class="nav-item"><a class="nav-link" href="mensajes.html">Mensajes</a></li>
+          <li class="nav-item"><a class="nav-link" href="configuracion.html">Configuración</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html">Cerrar sesión</a></li>
         </ul>
-        <span class="navbar-text text-white ms-3" id="userGreeting">Bienvenido, Usuario</span>
       </div>
     </div>
   </nav>
@@ -37,7 +40,7 @@
 
     async function cargarCitas() {
       const token = localStorage.getItem('token');
-      const res = await fetch('/api/appointments', {
+      const res = await fetch('/api/appointments?populateDoctorName=true', {
         headers: { 'Authorization': token }
       });
 
@@ -56,16 +59,20 @@
       }
 
       appointments.forEach(cita => {
-        const citaDateTime = new Date(`${cita.date}T${cita.time}`);
+        const citaDateTime = new Date(cita.date);
         const now = new Date();
         const editable = (citaDateTime - now) > 24 * 60 * 60 * 1000; // editable si falta más de 24 hrs
+
+        const doctorName = (typeof cita.doctor === 'object') 
+          ? `Dr. ${cita.doctor.name} (${cita.doctor.specialty || 'Sin especialidad'})` 
+          : cita.doctor;
 
         const item = document.createElement('div');
         item.className = 'list-group-item d-flex justify-content-between align-items-center flex-wrap';
         item.innerHTML = `
           <div>
-            <strong>${cita.patientName}</strong> con <strong>${cita.doctor}</strong><br />
-            Fecha: ${cita.date} Hora: ${cita.time}<br />
+            <strong>${cita.patientName}</strong> con <strong>${doctorName}</strong><br />
+            Fecha: ${citaDateTime.toLocaleDateString()} Hora: ${citaDateTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}<br />
             Motivo: ${cita.reason}
           </div>
           <div class="btn-group mt-2 mt-md-0">

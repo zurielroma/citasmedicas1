@@ -2,8 +2,11 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
+  name: { type: String },                    // Nombre del doctor o usuario
+  specialty: { type: String },               // Especialidad del doctor (opcional para otros roles)
   username: { type: String, required: true, unique: true },
-  password: { type: String, required: true }
+  password: { type: String, required: true },
+  role: { type: String, enum: ['admin', 'doctor', 'paciente'], default: 'paciente' }
 });
 
 // Cifrar la contraseña antes de guardar
